@@ -5,7 +5,7 @@ COPY ./OptractClient.tar.gz /tmp
 
 USER root
 RUN groupadd -g 1000 user && \
- useradd -d /data -u 1000 -g 1000 optract
+ useradd -m -d /data -u 1000 -g 1000 optract
 
 USER optract
 RUN mkdir /data/OptractClient && \
