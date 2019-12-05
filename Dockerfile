@@ -19,4 +19,4 @@ USER optract
 EXPOSE 45054
 EXPOSE 59437
 
-ENTRYPOINT ["/data/OptractClient/optRun"]
+ENTRYPOINT ["/data/OptractClient/dist/optRun"]
