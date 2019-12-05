@@ -15,6 +15,7 @@ USER root
 RUN rm -fr /tmp/OptractClient.tar.gz
 
 USER optract
+WORKDIR /data/OptractClient/dist
 
 EXPOSE 45054
 EXPOSE 59437
