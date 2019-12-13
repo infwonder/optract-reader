@@ -1,7 +1,23 @@
-FROM ubuntu:xenial
+FROM infwonder/ubuntu-builder as builder
 MAINTAINER jasonlin@11be.org
 
-COPY ./OptractClient.tar.gz /tmp
+RUN npm install -g asar
+
+RUN mkdir -p /app
+COPY package.json /app/
+WORKDIR /app
+
+RUN npm install 
+RUN mkdir -p /app/lib /app/resources /app/dapps
+RUN ls -l /app
+COPY ./lib /app/lib/
+COPY ./resources /app/resources/
+COPY ./dapps /app/dapps/
+
+RUN npm run release
+
+FROM ubuntu:xenial
+COPY --from=builder /app/OptractClient.tar.gz /tmp
 
 USER root
 RUN groupadd -g 1000 user && \
