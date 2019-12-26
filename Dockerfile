@@ -14,8 +14,6 @@ USER root
 RUN groupadd -g 1000 user && \
  useradd -m -d /optract -u 1000 -g 1000 optract
 
-RUN apt-get update && apt-get install -y vim
-
 USER optract
 COPY --from=builder /app/node_modules /optract/node_modules
 
