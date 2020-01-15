@@ -8,32 +8,23 @@ COPY package.json /app/
 WORKDIR /app
 
 RUN npm install 
-RUN mkdir -p /app/lib /app/resources /app/dapps
-RUN ls -l /app
-COPY ./lib /app/lib/
-COPY ./resources /app/resources/
-COPY ./dapps /app/dapps/
-
-RUN npm run release
 
 FROM ubuntu:xenial
-COPY --from=builder /app/OptractClient.tar.gz /tmp
-
 USER root
 RUN groupadd -g 1000 user && \
- useradd -m -d /data -u 1000 -g 1000 optract
+ useradd -m -d /optract -u 1000 -g 1000 optract
 
 USER optract
-RUN mkdir /data/OptractClient && \
- tar xf /tmp/OptractClient.tar.gz -C /data/OptractClient
+COPY --from=builder /app/node_modules /optract/node_modules
 
-USER root
-RUN rm -fr /tmp/OptractClient.tar.gz
+RUN mkdir -p /optract/bin /optract/lib /optract/dapps
+COPY ./lib /optract/lib/
+COPY ./resources/bin /optract/bin
+COPY ./dapps /optract/dapps/
 
-USER optract
-WORKDIR /data/OptractClient/dist
+WORKDIR /optract
 
 EXPOSE 45054
 EXPOSE 59437
 
-ENTRYPOINT ["/data/OptractClient/dist/optRun"]
+ENTRYPOINT ["/optract/bin/node", "./lib/daemon.js"]

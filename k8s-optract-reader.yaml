@@ -16,6 +16,7 @@ spec:
       containers:
         - name: optract-reader
           image: infwonder/optract-reader
+          imagePullPolicy: Always
           ports:
             - containerPort: 59437
             - containerPort: 45054
