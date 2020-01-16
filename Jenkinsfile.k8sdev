@@ -1,28 +1,45 @@
-def label = 'optract-reader-jenkins'
+def labelBuild = 'docker-builder-jenkins'
+def labelTests = 'optract-reader-jenkins'
 
 podTemplate(
-  label: label, 
+  label: labelBuild, 
   containers: [
-    containerTemplate(name: 'skaffold', image: 'gcr.io/k8s-skaffold/skaffold', ttyEnabled: true, command: 'cat')
+    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
   ]
 ) {
-  node(label) {
+  node(labelBuild) {
     def optReader = checkout scm
   
     stage('Skaffold') {
-      container('skaffold') {
+      container('Image build') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'username', passwordVariable: 'password')]) {
           sh """
+            docker build . -t docker.io/infwonder/optract-reader:k8sdev && \
             docker login -u ${username} -p ${password} && \
-            skaffold run && \
-            sleep 360
+            docker push docker.io/infwonder/optract-reader:k8sdev
           """
         }
       }
     }
+  }
 
+  podTemplate(
+    label: labelTests,
+    containers: [
+      containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command 'cat')
+    ]
+  ) {
+    node(labelTests) {
+      stage('Test drive') {
+        container('optract-reader-test') {
+          sh """
+            ./optRun
+          """
+        }
+      }
+    }
   }
 }
