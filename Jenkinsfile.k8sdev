@@ -3,7 +3,7 @@ def label = 'optract-reader-jenkins'
 podTemplate(
   label: label, 
   containers: [
-    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
+    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'skaffold', image: 'gcr.io/k8s-skaffold/skaffold', ttyEnabled: true, command: 'cat')
   ],
   volumes: [
