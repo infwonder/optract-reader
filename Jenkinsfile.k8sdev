@@ -29,14 +29,14 @@ podTemplate(
   podTemplate(
     label: labelTests,
     containers: [
-      containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat')
+      containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true)
     ]
   ) {
     node(labelTests) {
       stage('Test drive') {
         container('optract-reader-test') {
           sh """
-            /optract/bin/node /optract/lib/daemon.js
+            /optract/bin/node /optract/lib/tester.js
           """
         }
       }
