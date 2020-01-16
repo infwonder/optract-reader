@@ -13,8 +13,8 @@ podTemplate(
   node(labelBuild) {
     def optReader = checkout scm
   
-    stage('Skaffold') {
-      container('Image build') {
+    stage('Image build') {
+      container('docker') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'username', passwordVariable: 'password')]) {
           sh """
             docker build . -t docker.io/infwonder/optract-reader:k8sdev && \
