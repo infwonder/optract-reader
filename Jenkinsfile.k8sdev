@@ -29,7 +29,7 @@ podTemplate(
   podTemplate(
     label: labelTests,
     containers: [
-      containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command 'cat')
+      containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat')
     ]
   ) {
     node(labelTests) {
