@@ -36,7 +36,7 @@ podTemplate(
       stage('Test drive') {
         container('optract-reader-test') {
           sh """
-            ./optRun
+            /optract/bin/node ./lib/daemon.js
           """
         }
       }
