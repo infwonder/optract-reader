@@ -3,7 +3,6 @@ def label = 'optract-reader-jenkins'
 podTemplate(
   label: label, 
   containers: [
-    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'skaffold', image: 'gcr.io/k8s-skaffold/skaffold', ttyEnabled: true, command: 'cat')
   ],
   volumes: [
@@ -13,25 +12,17 @@ podTemplate(
   node(label) {
     def optReader = checkout scm
   
-    stage('Build') {
-      container('docker') {
+    stage('Skaffold') {
+      container('skaffold') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'username', passwordVariable: 'password')]) {
           sh """
-            docker build . -t docker.io/infwonder/optract-reader && \
             docker login -u ${username} -p ${password} && \
-            docker push docker.io/infwonder/optract-reader
+            skaffold run && \
+            sleep 360
           """
         }
       }
     }
 
-    stage('Deploy') {
-      container('skaffold') {
-        sh """
-          skaffold run && \
-          sleep 360
-        """
-      }
-    }
   }
 }
