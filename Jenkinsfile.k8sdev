@@ -15,10 +15,13 @@ podTemplate(
   
     stage('Build') {
       container('docker') {
-        sh """
-          docker build . -t docker.io/infwonder/optract-reader && \
-          docker push docker.io/infwonder/optract-reader
-        """
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'username', passwordVariable: 'password')]) {
+          sh """
+            docker build . -t docker.io/infwonder/optract-reader && \
+            docker login -u ${username} -p ${password} && \
+            docker push docker.io/infwonder/optract-reader
+          """
+        }
       }
     }
 
