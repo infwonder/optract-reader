@@ -5,6 +5,7 @@ podTemplate(
   label: labelBuild, 
   containers: [
     containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
+    containerTemplate(name: 'k8s-kubectl', image: 'infwonder/kubectl:1.16.5', ttyEnabled: true, command: 'cat')
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
@@ -43,8 +44,7 @@ podTemplate(
     podTemplate(
       label: labelTests,
       containers: [
-        containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'k8s-kubectl', image: 'infwonder/kubectl:1.16.5', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat')
       ]
     ) {
       node(labelTests) {
@@ -56,16 +56,17 @@ podTemplate(
           }
         }
 
-        stage('Clean up') {
-          container('k8s-kubectl') {
-            withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
-              sh """
-                echo "${kubeconfig}" > $PWD/kubeconfig && \
-                kubectl delete -f k8s/ && \
-                rm -fr $PWD/kubeconfig
-              """
-            }
-          }
+      }
+    }
+
+    stage('Clean up') {
+      container('k8s-kubectl') {
+        withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
+          sh """
+            echo "${kubeconfig}" > $PWD/kubeconfig && \
+            kubectl delete -f k8s/ && \
+            rm -fr $PWD/kubeconfig
+          """
         }
       }
     }
