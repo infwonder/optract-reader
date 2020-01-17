@@ -26,34 +26,35 @@ podTemplate(
     }
   }
 
-  // the test code is also inside same image, so we create tester pod and testee pod to test k8s service discovery as well
-  podTemplate(
-    label: labelTests,
-    containers: [
-      containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat')
-    ]
-  ) {
-    node(labelTests) {
+  node {
+    stage('Prepare test environment') {
+      kubernetesDeploy(
+        kubeconfigId: 'kubeconfig',
+        configs: 'k8s/optract-ipfs-test.yml'
+      )
+    }
 
-      stage('Prepare test environment') {
-        kubernetesDeploy(
-          kubeconfigId: 'kubeconfig',
-          configs: 'k8s/optract-ipfs-test.yml'
-        )
-      }
+    stage('Deploy testee on k8s') {
+      kubernetesDeploy(
+        kubeconfigId: 'kubeconfig',
+        configs: 'k8s/optract-reader-test.yml'
+      )
+    }
 
-      stage('Deploy testee on k8s') {
-        kubernetesDeploy(
-          kubeconfigId: 'kubeconfig',
-          configs: 'k8s/optract-reader-test.yml'
-        )
-      }
-
-      stage('Test drive') {
-        container('optract-reader-test') {
-          sh """
-            /optract/bin/node /optract/lib/tester.js ws://127.0.0.1:59437
-          """
+    // the test code is also inside same image, so we create tester pod and testee pod to test k8s service discovery as well
+    podTemplate(
+      label: labelTests,
+      containers: [
+        containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat')
+      ]
+    ) {
+      node(labelTests) {
+        stage('Test drive') {
+          container('optract-reader-test') {
+            sh """
+              /optract/bin/node /optract/lib/tester.js ws://127.0.0.1:59437
+            """
+          }
         }
       }
     }
