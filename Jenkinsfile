@@ -1,19 +1,17 @@
 def labelBuild = 'docker-builder-jenkins'
 def labelTests = 'optract-reader-jenkins'
+def optReader = checkout scm
 
 podTemplate(
   label: labelBuild, 
   containers: [
     containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'k8s-kubectl', image: 'infwonder/kubectl:1.16.5', ttyEnabled: true, command: 'cat')
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
   ]
 ) {
   node(labelBuild) {
-    def optReader = checkout scm
-  
     stage('Image build') {
       container('docker') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'username', passwordVariable: 'password')]) {
@@ -30,6 +28,7 @@ podTemplate(
       kubernetesDeploy(
         kubeconfigId: 'kubeconfig',
         configs: 'k8s/optract-ipfs-test.yml'
+        deleteResource: true
       )
     }
 
@@ -37,6 +36,7 @@ podTemplate(
       kubernetesDeploy(
         kubeconfigId: 'kubeconfig',
         configs: 'k8s/optract-reader-test.yml'
+        deleteResource: true
       )
     }
 
@@ -58,17 +58,21 @@ podTemplate(
 
       }
     }
+  }
 
+/*
+  node {
     stage('Clean up') {
-      container('k8s-kubectl') {
-        withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
-          sh """
-            echo "${kubeconfig}" > $PWD/kubeconfig && \
-            kubectl delete -f k8s/ && \
-            rm -fr $PWD/kubeconfig
-          """
-        }
+      withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
+        sh """
+          echo "${kubeconfig}" > $PWD/kubeconfig && \
+          export KUBECONFIG=$PWD/kubeconfig && \
+          kubectl delete -f k8s/ && \
+          rm -fr $PWD/kubeconfig
+        """
       }
     }
   }
+*/
+
 }
