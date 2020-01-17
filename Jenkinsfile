@@ -24,9 +24,7 @@ podTemplate(
         }
       }
     }
-  }
 
-  node {
     stage('Prepare test environment') {
       kubernetesDeploy(
         kubeconfigId: 'kubeconfig',
