@@ -43,7 +43,8 @@ podTemplate(
     podTemplate(
       label: labelTests,
       containers: [
-        containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'optract-reader-test', image: 'infwonder/optract-reader:k8sdev', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'k8s-kubectl', image: 'infwonder/kubectl:1.16.5', ttyEnabled: true, command: 'cat')
       ]
     ) {
       node(labelTests) {
@@ -54,14 +55,14 @@ podTemplate(
             """
           }
         }
-      }
-    }
-  }
 
-  node {
-    stage('Clean up') {
-      withKubeConfig([credentialsId: 'kubeconfig', serverUrl: 'https://kubernetes.default']) {
-        sh 'kubectl delete -f k8s/'
+        stage('Clean up') {
+          container('k8s-kubectl') {
+            withKubeConfig([credentialsId: 'kubeconfig', serverUrl: 'https://kubernetes.default', contextName: 'k8s.11be.org']) {
+              sh 'kubectl delete -f k8s/'
+            }
+          )
+        }
       }
     }
   }
