@@ -1,6 +1,5 @@
 def labelBuild = 'docker-builder-jenkins'
 def labelTests = 'optract-reader-jenkins'
-def optReader = checkout scm
 
 podTemplate(
   label: labelBuild, 
@@ -12,6 +11,7 @@ podTemplate(
   ]
 ) {
   node(labelBuild) {
+    def optReader = checkout scm
     stage('Image build') {
       container('docker') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'username', passwordVariable: 'password')]) {
@@ -55,24 +55,7 @@ podTemplate(
             """
           }
         }
-
       }
     }
   }
-
-/*
-  node {
-    stage('Clean up') {
-      withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
-        sh """
-          echo "${kubeconfig}" > $PWD/kubeconfig && \
-          export KUBECONFIG=$PWD/kubeconfig && \
-          kubectl delete -f k8s/ && \
-          rm -fr $PWD/kubeconfig
-        """
-      }
-    }
-  }
-*/
-
 }
