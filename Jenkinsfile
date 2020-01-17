@@ -58,8 +58,12 @@ podTemplate(
 
         stage('Clean up') {
           container('k8s-kubectl') {
-            withKubeConfig([credentialsId: 'kubeconfig', serverUrl: 'https://kubernetes.default', contextName: 'k8s.11be.org']) {
-              sh 'kubectl delete -f k8s/'
+            withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
+              sh """
+                echo "${kubeconfig}" > $PWD/kubeconfig && \
+                kubectl delete -f k8s/ && \
+                rm -fr $PWD/kubeconfig
+              """
             }
           }
         }
