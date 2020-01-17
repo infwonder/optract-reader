@@ -4,7 +4,7 @@ def labelTests = 'optract-reader-jenkins'
 podTemplate(
   label: labelBuild, 
   containers: [
-    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
+    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'k8s-kubectl', image: 'infwonder/kubectl:1.16.5', ttyEnabled: true, command: 'cat')
   ],
   volumes: [
