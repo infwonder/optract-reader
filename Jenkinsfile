@@ -57,4 +57,13 @@ podTemplate(
       }
     }
   }
+
+  node {
+    stage('Clean up') {
+      sh """
+        kubectl delete -f k8s/optract-ipfs-test.yml
+        kubectl delete -f k8s/optract-reader-test.yml
+      """
+    }
+  }
 }
