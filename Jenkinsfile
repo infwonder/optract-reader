@@ -51,7 +51,9 @@ podTemplate(
           }
         }
       }
+    }
 
+    stage('Clean up') {
       kubernetesDeploy(
         kubeconfigId: 'kubeconfig',
         configs: 'k8s/optract-ipfs-test.yml',
@@ -63,7 +65,6 @@ podTemplate(
         configs: 'k8s/optract-reader-test.yml',
         deleteResource: true
       )
-
     }
   }
 }
