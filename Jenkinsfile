@@ -60,10 +60,9 @@ podTemplate(
 
   node {
     stage('Clean up') {
-      sh """
-        kubectl delete -f k8s/optract-ipfs-test.yml
-        kubectl delete -f k8s/optract-reader-test.yml
-      """
+      withKubeConfig([credentialsId: 'kubeconfig', serverUrl: 'https://kubernetes.default']) {
+        sh 'kubectl delete -f k8s/'
+      }
     }
   }
 }
