@@ -27,7 +27,7 @@ podTemplate(
     stage('Prepare test environment') {
       kubernetesDeploy(
         kubeconfigId: 'kubeconfig',
-        configs: 'k8s/optract-ipfs-test.yml'
+        configs: 'k8s/optract-ipfs-test.yml',
         deleteResource: true
       )
     }
@@ -35,7 +35,7 @@ podTemplate(
     stage('Deploy testee on k8s') {
       kubernetesDeploy(
         kubeconfigId: 'kubeconfig',
-        configs: 'k8s/optract-reader-test.yml'
+        configs: 'k8s/optract-reader-test.yml',
         deleteResource: true
       )
     }
