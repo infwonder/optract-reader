@@ -50,7 +50,7 @@ podTemplate(
         stage('Test drive') {
           container('optract-reader-test') {
             sh """
-              /optract/bin/node /optract/lib/tester.js ws://127.0.0.1:59437
+              /optract/bin/node /optract/lib/tester.js ws://optract-service.default:59438 || exit 1
             """
           }
         }
