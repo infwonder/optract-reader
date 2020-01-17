@@ -61,7 +61,7 @@ podTemplate(
             withKubeConfig([credentialsId: 'kubeconfig', serverUrl: 'https://kubernetes.default', contextName: 'k8s.11be.org']) {
               sh 'kubectl delete -f k8s/'
             }
-          )
+          }
         }
       }
     }
