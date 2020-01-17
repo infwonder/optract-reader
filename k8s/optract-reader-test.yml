@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: optract-reader
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: optract-reader
+  template:
+    metadata:
+      name: optract-reader
+      labels:
+        app: optract-reader
+    spec:
+      containers:
+        - name: optract-reader
+          image: infwonder/optract-reader:k8sdev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 59437
+            - containerPort: 45054
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: optract-service
+spec:
+  selector:
+    app: optract-reader
+  type: NodePort
+  ports:
+    - name: websocket
+      protocol: TCP
+      port: 59437
+      nodePort: 30303
+      targetPort: 59437
+    - name: pubsub
+      protocol: TCP
+      port: 45054
+      nodePort: 30304
+      targetPort: 45054

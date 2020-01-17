@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: optract-ipfs
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: optract-ipfs
+  template:
+    metadata:
+      name: optract-ipfs
+      labels:
+        app: optract-ipfs
+    spec:
+      containers:
+        - name: optract-ipfs
+          image: infwonder/optract-go-ipfs:k8s-dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+            - containerPort: 5001
+          volumeMounts:
+            - name: ipfslist-config
+              mountPath: /data/ipfs/config
+      volumes:
+        - name: ipfslist-config
+          configMap:
+            name: ipfs-custom-list
+            items:
+              - key: ipfs.list
+                path: ipfs.list
+---
+apiVersion: v1
+data:
+  ipfs.list: |
+    /ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM
+    /ipfs/QmWqVP4i86MWg8qmKir52oyyK7vCmFK4sXvwaCapM9C2mg
+kind: ConfigMap
+metadata:
+  name: ipfs-custom-list
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: optract-ipfs-gateway
+  labels:
+    app: optract-ipfs-gateway
+spec:
+  selector:
+    app: optract-ipfs
+  ports:
+    - name: ipfs
+      protocol: TCP
+      port: 5001
+#---
+#apiVersion: networking.k8s.io/v1beta1
+#kind: Ingress
+#metadata:
+#  name: optract-ipfs-rules
+#  annotations:
+#    nginx.ingress.kubernetes.io/use-regex: "true"
+#spec:
+#  rules:
+#  - host: optract.lan
+#    http:
+#      paths:
+#      - path: /ipfs/.*
+#        backend:
+#          serviceName: optract-ipfs-gateway
+#          servicePort: 8080
